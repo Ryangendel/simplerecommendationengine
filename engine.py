@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.metrics.pairwise import cosine_similarity
@@ -10,8 +11,7 @@ class SimpleRecommender:
         cats = OneHotEncoder(handle_unknown="ignore", sparse_output=False).fit_transform(self.catalog[["category", "subcategory", "brand"]])
         nums = MinMaxScaler().fit_transform(self.catalog[["final_price", "rating", "discount"]])
 
-        features = list(cats.T) + list(nums.T)
-        features = pd.DataFrame(features).T.values
+        features = np.hstack([cats, nums])
 
         self.similarity = cosine_similarity(features)
 
@@ -39,5 +39,3 @@ if __name__ == "__main__":
     rec = SimpleRecommender().fit(df)
 
     print(rec.recommend("U000000").to_string(index=False))
-
-    features = pd.concat([pd.DataFrame(cats), pd.DataFrame(nums)])
